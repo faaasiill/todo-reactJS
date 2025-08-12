@@ -11,7 +11,9 @@ export const InputField = () => {
     e.preventDefault();
     const trimmedText = text.trim();
     if (!trimmedText) {
-      window.dispatchEvent(new CustomEvent("todoError", { detail: "Cannot add empty todo" }));
+      window.dispatchEvent(
+        new CustomEvent("todoError", { detail: "Cannot add empty todo" })
+      );
       return;
     }
 
@@ -24,13 +26,28 @@ export const InputField = () => {
 
     try {
       const existingTodos = loadTodos();
+
+      const isDuplicate = existingTodos.some(
+        (todo) => todo.text.toLowerCase() === trimmedText.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        window.dispatchEvent(
+          new CustomEvent("todoError", { detail: "Todo already exists" })
+        );
+        return;
+      }
       const updatedTodos = [...existingTodos, newTodo]; // Append new todo at the end
       saveTodos(updatedTodos);
       setText("");
       window.dispatchEvent(new Event("todoAdded"));
     } catch (error: unknown) {
       console.error("Failed to save todo:", error);
-      window.dispatchEvent(new CustomEvent("todoError", { detail: "Failed to add todo: Storage limit reached" }));
+      window.dispatchEvent(
+        new CustomEvent("todoError", {
+          detail: "Failed to add todo: Storage limit reached",
+        })
+      );
     }
   };
 
@@ -39,7 +56,9 @@ export const InputField = () => {
       <Input
         type="text"
         value={text}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setText(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setText(e.target.value)
+        }
         placeholder="Enter todo..."
       />
       <Button type="submit" className="text-xs font-medium">
