@@ -1,14 +1,40 @@
 import { useState, useEffect } from "react";
-import { TodoTitle } from "./TodoTitle";
 import { loadTodos, saveTodos } from "../../utils/localStorage";
 import type { Todo } from "../../types/todo";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 import type { AlertState } from "../../types/alert";
+import type { DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { SortableTodoItem } from "./SortableTodoItem";
 
 export const TodoDisplay = () => {
   const [todos, setTodos] = useState<Todo[]>(loadTodos());
-  const [alert, setAlert] = useState<AlertState>({ type: "success", message: "", visible: false });
+  const [alert, setAlert] = useState<AlertState>({
+    type: "success",
+    message: "",
+    visible: false,
+  });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   useEffect(() => {
     const handleTodoAdded = () => {
@@ -65,6 +91,17 @@ export const TodoDisplay = () => {
     }
   };
 
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (over && active.id !== over.id) {
+      const oldIndex = todos.findIndex((t) => t.id === active.id);
+      const newIndex = todos.findIndex((t) => t.id === over.id);
+      const reordered = arrayMove(todos, oldIndex, newIndex);
+      setTodos(reordered);
+      saveTodos(reordered);
+    }
+  };
+
   return (
     <div className="my-6 sm:my-10 relative">
       {alert.visible && (
@@ -82,21 +119,33 @@ export const TodoDisplay = () => {
             ) : (
               <CheckCircle2Icon />
             )}
-            <AlertTitle>{alert.type === "error" ? "Error" : "Success"}</AlertTitle>
+            <AlertTitle>
+              {alert.type === "error" ? "Error" : "Success"}
+            </AlertTitle>
             <AlertDescription>{alert.message}</AlertDescription>
           </Alert>
         </div>
       )}
-      <div>
-        {todos.map((todo) => (
-          <TodoTitle
-            key={todo.id}
-            todo={todo}
-            updateTodo={updateTodo}
-            deleteTodo={deleteTodo}
-          />
-        ))}
-      </div>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={todos.map((t) => t.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {todos.map((todo) => (
+            <SortableTodoItem
+              key={todo.id}
+              todo={todo}
+              updateTodo={updateTodo}
+              deleteTodo={deleteTodo}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };

@@ -1,12 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Mynerve&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Mynerve&display=swap");
+body {
+  background-color: #fdfbf3;
+}
 #root {
-font-family: "Mynerve", cursive;
+  font-family: "Mynerve", cursive;
   width: 100vw;
   height: 100vh;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color: #fdfbf3;
 }
 
 .logo {
@@ -101,17 +103,17 @@ font-family: "Mynerve", cursive;
 
 .underlined {
   position: relative;
-  display: inline-block; 
+  display: inline-block;
 }
 
 .underlined::after {
-  content: ""; 
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
-  height: 7px; 
+  height: 7px;
   width: 100%;
-  border: solid 2px #1871cb; 
-  border-color: #1871cb transparent transparent transparent; 
-  border-radius: 50%; 
+  border: solid 2px #1871cb;
+  border-color: #1871cb transparent transparent transparent;
+  border-radius: 50%;
 }

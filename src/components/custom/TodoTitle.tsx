@@ -25,7 +25,9 @@ export const TodoTitle = ({ todo, updateTodo, deleteTodo }: TodoTitleProps) => {
   const handleSave = () => {
     const trimmedText = editText.trim();
     if (!trimmedText) {
-      window.dispatchEvent(new CustomEvent("todoError", { detail: "Cannot save empty todo" }));
+      window.dispatchEvent(
+        new CustomEvent("todoError", { detail: "Cannot save empty todo" })
+      );
       setEditText(todo.text);
       setIsEditing(false);
       return;
@@ -44,29 +46,35 @@ export const TodoTitle = ({ todo, updateTodo, deleteTodo }: TodoTitleProps) => {
   };
 
   return (
-    <div className="flex border-b justify-between p-2 sm:p-3">
+    <div className="flex border-b justify-between cursor-grab p-2 sm:p-3">
       <div className="flex items-center gap-1 sm:gap-2">
         <Checkbox
           checked={todo.completed}
           onCheckedChange={handleToggleComplete}
+          onPointerDown={(e) => e.stopPropagation()}
         />
+
         {isEditing ? (
           <Input
             type="text"
             value={editText}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditText(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEditText(e.target.value)
+            }
             className="text-sm sm:text-base"
           />
         ) : (
           <h3
-  className="font-medium text-sm sm:text-base"
-  style={{
-    textDecoration: todo.completed ? "line-through" : "none",
-    textDecorationColor: todo.completed ? "oklch(64.5% 0.246 16.439)" : "inherit",
-  }}
->
-  {todo.text}
-</h3>
+            className="font-medium text-sm sm:text-base"
+            style={{
+              textDecoration: todo.completed ? "line-through" : "none",
+              textDecorationColor: todo.completed
+                ? "oklch(64.5% 0.246 16.439)"
+                : "inherit",
+            }}
+          >
+            {todo.text}
+          </h3>
         )}
       </div>
       <div className="flex gap-2 sm:gap-3 items-center">
